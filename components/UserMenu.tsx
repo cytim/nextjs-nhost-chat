@@ -3,6 +3,8 @@ import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon, LogoutIcon } from '@heroicons/react/outline'
 import Avatar from './Avatar'
 
+import { useSignOut } from '@nhost/nextjs'
+
 export type UserMenuProps = {
   email?: string | undefined
   displayName: string | undefined
@@ -11,6 +13,7 @@ export type UserMenuProps = {
 
 const UserMenu = ({ email, displayName, avatarUrl }: UserMenuProps) => {
   // TODO: Implement logging out user
+  const { signOut } = useSignOut()
 
   return (
     <Menu as="div" className="relative z-50">
@@ -41,7 +44,7 @@ const UserMenu = ({ email, displayName, avatarUrl }: UserMenuProps) => {
           <Menu.Item>
             <button
               className="flex w-full items-center space-x-2 py-2 px-4 hover:bg-gray-100"
-              onClick={() => null}
+              onClick={signOut}
             >
               <LogoutIcon className="h-5 w-5 shrink-0 text-gray-500" />
               <span>Logout</span>

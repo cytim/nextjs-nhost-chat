@@ -3,8 +3,11 @@ import Image from 'next/image'
 import logo from '../public/logo.svg'
 import githubLogo from '../public/github.svg'
 
+import { useProviderLink } from '@nhost/nextjs'
+
 const Login = () => {
   // TODO: Implement Google+Github authentication
+  const { github } = useProviderLink()
 
   return (
     <div className="w-full max-w-md">
@@ -13,7 +16,7 @@ const Login = () => {
         <p className="mt-4 text-center">Please sign in to access the chat</p>
         <div className="mt-8 space-y-4">
           <a
-            href="#"
+            href={github}
             className="flex items-center justify-center space-x-2 rounded-md border border-opacity-50 px-6 py-2 hover:bg-gray-50"
           >
             <Image src={githubLogo} alt="Github" width={32} height={32} />
