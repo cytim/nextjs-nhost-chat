@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import className from 'classnames'
 import Avatar from './Avatar'
 import { PencilIcon, TrashIcon } from '@heroicons/react/outline'
+import { useUserData } from '@nhost/nextjs'
 
 export type MessageProps = {
   id: string
@@ -28,8 +29,8 @@ const Message = ({
 }: MessageProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // TODO: Check if current authenticated user if the author of the message
-  const isAuthor = false
+  const user = useUserData()
+  const isAuthor = author?.id === user?.id
 
   const [editing, setEditing] = useState(false)
   const [newText, setNewText] = useState(text)

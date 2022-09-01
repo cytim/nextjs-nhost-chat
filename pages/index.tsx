@@ -12,10 +12,67 @@ import Login from '../components/Login'
 import { useUserData } from '@nhost/nextjs'
 import UserMenu from '../components/UserMenu'
 
+import { useMutation, useSubscription } from '@apollo/client'
+import Message, { MessageProps } from '../components/Message'
+import MessageSkeleton from '../components/MessageSkeleton'
+
+import {
+  CREATE_MESSAGE,
+  GET_MESSAGES,
+  DELETE_MESSAGE,
+  UPDATE_MESSAGE,
+} from '../lib/queries'
+
 const Home: NextPage = () => {
   const { isLoading: isLoadingUser, isAuthenticated } =
     useAuthenticationStatus()
   const user = useUserData()
+
+  const [createMessage] = useMutation(CREATE_MESSAGE)
+  const [deleteMessage] = useMutation(DELETE_MESSAGE)
+  const [updateMessage] = useMutation(UPDATE_MESSAGE)
+
+  const createMessageHandler = (text: string) => {
+    if (!user) return
+
+    return createMessage({
+      variables: {
+        object: {
+          text,
+        },
+      },
+    })
+  }
+
+  const deleteMessageHandler = (id: string) => {
+    if (!id) return
+
+    return deleteMessage({
+      variables: {
+        id,
+      },
+    })
+  }
+
+  const updateMessageHandler = (id: string, text: string) => {
+    if (!id || !text) return
+
+    return updateMessage({
+      variables: {
+        id,
+        text,
+      },
+    })
+  }
+
+  const {
+    loading: isLoadingMessages,
+    error,
+    data,
+  } = useSubscription(GET_MESSAGES, {
+    skip: isLoadingUser || !isAuthenticated,
+  })
+  let messages = data?.messages ?? []
 
   return (
     <>
@@ -51,11 +108,39 @@ const Home: NextPage = () => {
                       This is the beginning of this chat.
                     </p>
                   </div>
+
+                  {isLoadingMessages ? (
+                    <div className="my-6 space-y-4">
+                      {[...new Array(5)].map((_, i) => (
+                        <MessageSkeleton key={i} />
+                      ))}
+                    </div>
+                  ) : error ? (
+                    <p className="my-6 text-center text-red-500">
+                      Something went wrong. Try to refresh the page.
+                    </p>
+                  ) : messages.length > 0 ? (
+                    <ol className="my-6 space-y-2">
+                      {messages.map((msg: MessageProps) => (
+                        <li key={msg.id}>
+                          <Message
+                            {...msg}
+                            onDelete={deleteMessageHandler}
+                            onEdit={updateMessageHandler}
+                          />
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="my-6 text-center text-gray-500">
+                      No messages yet.
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="mx-auto mb-6 w-full max-w-screen-md flex-shrink-0 px-4">
-                <Form />
+                <Form onSubmit={createMessageHandler} />
               </div>
             </>
           )}
