@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "nextjs-nhost-chat",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
